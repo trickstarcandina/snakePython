@@ -226,6 +226,6 @@ if dead:
     ag_file = "gif/lose.gif"
     sendGIF(ag_file)
 else:
-    ag_file = ""gif/win.gif"
+    ag_file = "gif/win.gif"
     sendGIF(ag_file)
     print('WOW bạn đã thắng' + term.clear_eos)
