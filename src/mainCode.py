@@ -9,12 +9,10 @@ UP = term.KEY_UP
 RIGHT = term.KEY_RIGHT
 LEFT = term.KEY_LEFT
 DOWN = term.KEY_DOWN
-DIRECTIONS = [LEFT, UP, RIGHT, DOWN]
+DIRECTIONS = [LEFT, RIGHT,UP,  DOWN]
 MOVEMENT_MAP = {LEFT: [0, -1], UP: [-1, 0], RIGHT: [0, 1], DOWN: [1, 0]}
 WASD_MAP = {'w': UP, 'a': LEFT, 's': DOWN, 'd': RIGHT,
             'W': UP, 'A': LEFT, 'S': DOWN, 'D': RIGHT}
-dead = False
-
 
 def sendGIF(ag_file):
     animation = pyglet.resource.animation(ag_file)
@@ -40,14 +38,13 @@ DUCK = '🦆'
 # init snake
 snake = deque([[6, 5], [6, 4], [6, 3]])
 # init food
-food = [5, 1]
-h, w = 20, 30  # height, width
+food = [12, 12]
 score = 0
 # init speed
 speed = 5
 # max speed
 MAX_SPEED = 7
-
+dead = False
 # tần số chuyển động của rắn
 # Rắn chỉ di chuyển N1 trong N2 số lượt.
 N1 = 1
@@ -62,13 +59,13 @@ messages = ['cố lên bạn có thể làm được!', "đừng để bị ăn 
 message = None
 
 
-def list_empty_spaces(world, space):
-    result = []
-    for i in range(len(world)):
-        for j in range(len(world[i])):
-            if world[i][j] == space:
-                result.append([i, j])
-    return result
+# def list_empty_spaces(world, space):
+#     result = []
+#     for i in range(len(world)):
+#         for j in range(len(world[i])):
+#             if world[i][j] == space:
+#                 result.append([i, j])
+#     return result
 
 
 with term.cbreak(), term.hidden_cursor():
@@ -106,8 +103,7 @@ with term.cbreak(), term.hidden_cursor():
     head = snake[2]
     world[head[0]][head[1]] = HEAD
     world[food[0]][food[1]] = DUCK
-    for row in world:
-        print(' '.join(row))
+    
     print('sử dụng các phím ←, ↑, →, ↓ hoặc phím WASD để duy chuyển!')
     print("bạn đang là đồ ăn 😱 hãy tìm cách lừa rắn để chiến thắng\n")
 
@@ -131,17 +127,21 @@ with term.cbreak(), term.hidden_cursor():
         if abs(y_diff) > abs(x_diff):
             if y_diff <= 0:
                 preferred_move = UP
+                preferred_moves= [UP,RIGHT,LEFT,DOWN]
             else:
                 preferred_move = DOWN
+                preferred_moves= [DOWN,LEFT,RIGHT,UP]
         else:
             if x_diff >= 0:
                 preferred_move = RIGHT
+                preferred_moves=[RIGHT,UP,DOWN,LEFT]
             else:
                 preferred_move = LEFT
+                preferred_moves=[LEFT,UP,DOWN,RIGHT]
 
         # kiểm tra xem nước đi ưu tiên có hợp lệ không
         # nếu không, hãy kiểm tra xem tất cả các nước đi khác có hợp lệ không
-        preferred_moves = [preferred_move] + list(DIRECTIONS)
+        # preferred_moves = [preferred_move] + list(DIRECTIONS)
 
         next_move = None
         for move in preferred_moves:
@@ -212,7 +212,7 @@ with term.cbreak(), term.hidden_cursor():
         for row in world:
             print(' '.join(row))
         score = len(snake) - 3
-        print(f'Điểm: {turn} - Độ dài: {len(snake)}' + term.clear_eol)
+        print(f'Turn:{turn} Điểm: {score} - Độ dài: {len(snake)}' + term.clear_eol)
         if dead:
             break
         if turn % 50 == 0:
