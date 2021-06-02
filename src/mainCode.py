@@ -38,15 +38,15 @@ SPACE = '  '
 DUCK = '🦆'
 
 # init snake
-snake = deque([[6, 5], [6, 4], [6, 3]])
+snake = deque([[8, 6], [8, 5], [8, 4]])
 # init food
 food = [5, 1]
 h, w = 20, 30  # height, width
 score = 0
 # init speed
-speed = 5
+speed = 1
 # max speed
-MAX_SPEED = 7
+MAX_SPEED = 3
 
 # tần số chuyển động của rắn
 # Rắn chỉ di chuyển N1 trong N2 số lượt.
@@ -81,9 +81,9 @@ with term.cbreak(), term.hidden_cursor():
     world = [['⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️'],
              ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️'],
              ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '⬜️', '  ', '  ', '  ', '  ', '⬜️'],
-             ['⬜️', '  ', '  ', '⬜️', '  ', '⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '  ', '  ', '  ', '  ', '⬜️'],
-             ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '  ', '  ', '  ', '  ', '  ', '⬜️'],
-             ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️'],
+             ['⬜️', '  ', '  ', '⬜️', '  ', '⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '  ', '  ', '  ', '  ', '⬜️'],
+             ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '⬜️', '  ', '  ', '  ', '  ', '⬜️'],
+             ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '⬜️', '  ', '  ', '  ', '  ', '⬜️'],
              ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '⬜️', '  ', '  ', '  ', '  ', '⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️'],
              ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️'],
              ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️'],
@@ -128,20 +128,39 @@ with term.cbreak(), term.hidden_cursor():
         x_diff = food[1] - head[1]
 
         preferred_move = None
+        preferred_moves = []
         if abs(y_diff) > abs(x_diff):
             if y_diff <= 0:
                 preferred_move = UP
             else:
                 preferred_move = DOWN
+            preferred_moves = [preferred_move] + list(preferred_moves)
+            if x_diff >= 0:
+                preferred_moves = list(preferred_moves) + [RIGHT, LEFT]
+            else:
+                preferred_moves = list(preferred_moves) + [LEFT, RIGHT]
+            if UP in preferred_moves:
+                preferred_moves = list(preferred_moves) + [DOWN]
+            else:
+                preferred_moves = list(preferred_moves) + [UP]
         else:
             if x_diff >= 0:
                 preferred_move = RIGHT
             else:
                 preferred_move = LEFT
+            preferred_moves = [preferred_move] + list(preferred_moves)
+            if y_diff <= 0:
+                preferred_moves = list(preferred_moves) + [UP, DOWN]
+            else:
+                preferred_moves = list(preferred_moves) + [DOWN, UP]
+            if RIGHT in preferred_moves:
+                preferred_moves = list(preferred_moves) + [LEFT]
+            else:
+                preferred_moves = list(preferred_moves) + [RIGHT]
 
         # kiểm tra xem nước đi ưu tiên có hợp lệ không
         # nếu không, hãy kiểm tra xem tất cả các nước đi khác có hợp lệ không
-        preferred_moves = [preferred_move] + list(DIRECTIONS)
+        # preferred_moves = [preferred_move] + list(DIRECTIONS)
 
         next_move = None
         for move in preferred_moves:
