@@ -13,13 +13,14 @@ DIRECTIONS = [LEFT, UP, RIGHT, DOWN]
 MOVEMENT_MAP = {LEFT: [0, -1], UP: [-1, 0], RIGHT: [0, 1], DOWN: [1, 0]}
 WASD_MAP = {'w': UP, 'a': LEFT, 's': DOWN, 'd': RIGHT,
             'W': UP, 'A': LEFT, 'S': DOWN, 'D': RIGHT}
+
 dead = False
 
 
 def sendGIF(ag_file):
     animation = pyglet.resource.animation(ag_file)
     sprite = pyglet.sprite.Sprite(animation)
-    # create a window and set gif
+    # tạo window và set gif
     winda = pyglet.window.Window(width=sprite.width, height=sprite.height)
 
     @winda.event
@@ -38,7 +39,7 @@ SPACE = '  '
 DUCK = '🦆'
 
 # init snake
-snake = deque([[8, 6], [8, 5], [8, 4]])
+snake = deque([[2, 6], [2, 5], [2, 4]])
 # init food
 food = [5, 1]
 h, w = 20, 30  # height, width
@@ -54,21 +55,11 @@ N1 = 1
 N2 = 2
 
 # Sau growUp turn rắn sẽ lớn lên
-growUp = 9
+growUp = 8
 # end config
 
-messages = ['cố lên bạn có thể làm được!', "đừng để bị ăn thịt!",
-            'nhanh, nhanh lên nào!', "bạn có thể đánh bại nó!", "vượt qua con rắn!"]
+messages = ['cố lên bạn có thể làm được!', "đừng để bị ăn thịt!", 'nhanh, nhanh lên nào!', "bạn có thể đánh bại nó!", "vượt qua con rắn!"]
 message = None
-
-
-def list_empty_spaces(world, space):
-    result = []
-    for i in range(len(world)):
-        for j in range(len(world[i])):
-            if world[i][j] == space:
-                result.append([i, j])
-    return result
 
 
 with term.cbreak(), term.hidden_cursor():
@@ -76,31 +67,6 @@ with term.cbreak(), term.hidden_cursor():
     print(term.home + term.clear)
 
     # Init ma trận
-    # world = [[SPACE] * w for _ in range(h)]
-    """
-    world = [['⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️'],
-             ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️'],
-             ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '⬜️', '  ', '  ', '  ', '  ', '⬜️'],
-             ['⬜️', '  ', '  ', '⬜️', '  ', '⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '  ', '  ', '  ', '  ', '⬜️'],
-             ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '⬜️', '  ', '  ', '  ', '  ', '⬜️'],
-             ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '⬜️', '  ', '  ', '  ', '  ', '⬜️'],
-             ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '⬜️', '  ', '  ', '  ', '  ', '⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️'],
-             ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️'],
-             ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️'],
-             ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️'],
-             ['⬜️', '  ', '⬜️', '⬜️', '⬜️', '⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '⬜️', '  ', '⬜️'],
-             ['⬜️', '  ', '⬜️', '  ', '  ', '⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️', '⬜️', '  ', '⬜️'],
-             ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️'],
-             ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️'],
-             ['⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️']]
-    
-    for i in range(h):
-        world[i][0] = BORDER
-        world[i][-1] = BORDER
-    for j in range(w):
-        world[0][j] = BORDER
-        world[-1][j] = BORDER
-    """
     world = [['⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️', '⬜️'],
          ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️'],
          ['⬜️', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '⬜️'],
@@ -121,6 +87,8 @@ with term.cbreak(), term.hidden_cursor():
     head = snake[2]
     world[head[0]][head[1]] = HEAD
     world[food[0]][food[1]] = DUCK
+
+    #print matrix
     for row in world:
         print(' '.join(row))
     print('sử dụng các phím ←, ↑, →, ↓ hoặc phím WASD để duy chuyển!')
@@ -137,37 +105,44 @@ with term.cbreak(), term.hidden_cursor():
         if not moving:
             continue
 
-        # rắn quyết định nơi di chuyển
+        # rắn quyết định nơi di chuyển bằng cách tính toán vị trí đầu rắn so với vịt 
         head = snake[0]
         y_diff = food[0] - head[0]
         x_diff = food[1] - head[1]
 
         preferred_move = None
         preferred_moves = []
+        #ưu tiên đi lên / xuống trước
         if abs(y_diff) > abs(x_diff):
             if y_diff <= 0:
                 preferred_move = UP
             else:
                 preferred_move = DOWN
+            #add vào mảng thứ tự
             preferred_moves = [preferred_move] + list(preferred_moves)
+            #sau khi đi lên hoặc xuống sẽ rẽ trái(phải) tùy vào độ ưu tiên 
             if x_diff >= 0:
                 preferred_moves = list(preferred_moves) + [RIGHT, LEFT]
             else:
                 preferred_moves = list(preferred_moves) + [LEFT, RIGHT]
+            #vị trí ưu tiên cuối 
             if UP in preferred_moves:
                 preferred_moves = list(preferred_moves) + [DOWN]
             else:
                 preferred_moves = list(preferred_moves) + [UP]
+        #ưu tiên rẽ trái hoặc phải
         else:
             if x_diff >= 0:
                 preferred_move = RIGHT
             else:
                 preferred_move = LEFT
             preferred_moves = [preferred_move] + list(preferred_moves)
+            #tương tự trên sẽ lên(xuống)
             if y_diff <= 0:
                 preferred_moves = list(preferred_moves) + [UP, DOWN]
             else:
                 preferred_moves = list(preferred_moves) + [DOWN, UP]
+            #ưu tiên cuối 
             if RIGHT in preferred_moves:
                 preferred_moves = list(preferred_moves) + [LEFT]
             else:
@@ -175,7 +150,6 @@ with term.cbreak(), term.hidden_cursor():
 
         # kiểm tra xem nước đi ưu tiên có hợp lệ không
         # nếu không, hãy kiểm tra xem tất cả các nước đi khác có hợp lệ không
-        # preferred_moves = [preferred_move] + list(DIRECTIONS)
 
         next_move = None
         for move in preferred_moves:
@@ -246,7 +220,7 @@ with term.cbreak(), term.hidden_cursor():
         for row in world:
             print(' '.join(row))
         score = len(snake) - 3
-        print(f'Điểm: {turn} - Độ dài: {len(snake)}' + term.clear_eol)
+        print(f'Lượt: {turn} - Điểm: {score} - Độ dài: {len(snake)}' + term.clear_eol)
         if dead:
             break
         if turn % 50 == 0:
