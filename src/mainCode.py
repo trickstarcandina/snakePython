@@ -172,12 +172,11 @@ with term.cbreak(), term.hidden_cursor():
             break
 
         turn += 1
-        # rắn chỉ di chuyển N - 1 trong số N lượt.
         # trước khi rắn di chuyển, clear toàn bộ vị trí của thức ăn
         world[duck[0]][duck[1]] = SPACE
         if turn % 2 < 1:
             snake.appendleft(next_move)
-            # sau growUp turn rắn sẽ dài, to và nhanh hơn :))
+            # sau growUp turn rắn sẽ dài ra và nhanh hơn
             world[head[0]][head[1]] = BODY
             if turn % growUp != 0:
                 speed = min(speed * 1.68, MAX_SPEED)
